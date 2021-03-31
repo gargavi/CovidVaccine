@@ -3,6 +3,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.select import Select
 from bs4 import BeautifulSoup
 
+from params import params
+
 import datetime
 from twilio.rest import Client 
 import multiprocessing
@@ -17,7 +19,7 @@ chromedriver = "./chromedriver.exe"
 driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
 
 
-client = Client("AC63e2bb6218122994deedf573efbd6e6d", "fa754cd367fb787f1e78342f9916cf92" )
+client = Client(params["client"], params["secret"])
 
 
 
@@ -31,7 +33,7 @@ def check_status(cvs = True, myturn = True):
         print(now.strftime('%H:%M:%S on %A, %B the %dth, %Y'), status)
 
         if (status != "Fully Booked" and status != "" and status != " "):
-            client.messages.create( to = "+19256998052", from_ = "+15706309420", body = f"CVS {now.strftime('%H:%M:%S on %A, %B the %dth, %Y')}, {status}" )
+            client.messages.create( to = params["phone"], from_ = params["from"], body = f"CVS {now.strftime('%H:%M:%S on %A, %B the %dth, %Y')}, {status}" )
     if myturn:
         driver.get("https://myturn.ca.gov/")
         time.sleep(2)
@@ -64,7 +66,7 @@ def check_status(cvs = True, myturn = True):
 
 while True: 
     try:
-        check_status(cvs = False)
+        check_status()
     except Exception as e:
         print(e)
     time.sleep(300)
